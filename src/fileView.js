@@ -13,11 +13,11 @@ import { preview, extensions } from './render/fileExtension'
  * @param {string} lang The markdown code language string, usually just the file extension
  */
 async function renderCodePreview(file, lang) {
-  const resp = await fetch(file['@microsoft.graph.downloadUrl'])
-  const content = await resp.text()
-  const toMarkdown = `\`\`\`${lang}\n${content}\n\`\`\``
-  const renderedCode = marked(toMarkdown)
-  return `<div class="markdown-body" style="margin-top: 0;">
+    const resp = await fetch(file['@microsoft.graph.downloadUrl'])
+    const content = await resp.text()
+    const toMarkdown = `\`\`\`${lang}\n${content}\n\`\`\``
+    const renderedCode = marked(toMarkdown)
+    return `<div class="markdown-body" style="margin-top: 0;">
             ${renderedCode}
           </div>`
 }
@@ -28,15 +28,15 @@ async function renderCodePreview(file, lang) {
  * @param {Object} file Object representing the PDF to preview
  */
 function renderPDFPreview(file) {
-  return `<div id="pdf-preview-wrapper"></div>
+    return `<div id="pdf-preview-wrapper"></div>
           <div class="loading-label">
             <i class="fas fa-spinner fa-pulse"></i>
             <span id="loading-progress">Loading PDF...</span>
           </div>
+          <script src="https://cdn.jsdelivr.net/gh/pipwerks/PDFObject/pdfobject.min.js"></script>
           <script>
-          // No variable declaration. Described in https://github.com/spencerwooo/onedrive-cf-index/pull/46
-          loadingLabel = document.querySelector('.loading-label')
-          loadingProgress = document.querySelector('#loading-progress')
+          const loadingLabel = document.querySelector('.loading-label')
+          const loadingProgress = document.querySelector('#loading-progress')
           function progress({ loaded, total }) {
             loadingProgress.innerHTML = 'Loading PDF... ' + Math.round(loaded / total * 100) + '%'
           }
@@ -111,7 +111,7 @@ function renderPDFPreview(file) {
  * @param {Object} file Object representing the image to preview
  */
 function renderImage(file) {
-  return `<div class="image-wrapper">
+    return `<div class="image-wrapper">
             <img data-zoomable src="${file['@microsoft.graph.downloadUrl']}" alt="${file.name}" style="width: 100%; height: auto; position: relative;"></img>
           </div>`
 }
@@ -122,7 +122,8 @@ function renderImage(file) {
  * @param {Object} file Object representing the video to preview
  */
 function renderVideoPlayer(file) {
-  return `<div id="dplayer"></div>
+    return `<div id="dplayer"></div>
+          <script src="https://cdn.jsdelivr.net/npm/dplayer@1.26.0/dist/DPlayer.min.js"></script>
           <script>
           const dp = new DPlayer({
             container: document.getElementById('dplayer'),
@@ -135,13 +136,33 @@ function renderVideoPlayer(file) {
           </script>`
 }
 
+function renderMKVPlayer(file) {
+    return `<link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.1/video-js.min.css" rel="stylesheet">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.1/video.min.js"></script>
+            <video id="my-player" class="video-js" controls
+            preload="auto"
+            poster="/render/poster.jpg"
+            data-setup='{}'>
+            <source src="${file['@microsoft.graph.downloadUrl']}" type="video/mp4"></source>
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a
+                web browser that
+            <a href="https://videojs.com/html5-video-support/" target="_blank">
+                supports HTML5 video
+            </a>
+            </p>
+            </video>`
+}
+
 /**
  * Render audio (mp3, aac, wav, oga ...)
  *
  * @param {Object} file Object representing the audio to preview
  */
 function renderAudioPlayer(file) {
-  return `<div id="aplayer"></div>
+    return `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css">
+          <div id="aplayer"></div>
+          <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script>
           <script>
           const ap = new APlayer({
             container: document.getElementById('aplayer'),
@@ -160,7 +181,7 @@ function renderAudioPlayer(file) {
  * @param {string} fileExt The file extension parsed
  */
 function renderUnsupportedView(fileExt) {
-  return `<div class="markdown-body" style="margin-top: 0;">
+    return `<div class="markdown-body" style="margin-top: 0;">
             <p>Sorry, we don't support previewing <code>.${fileExt}</code> files as of today. You can download the file directly.</p>
           </div>`
 }
@@ -172,49 +193,51 @@ function renderUnsupportedView(fileExt) {
  * @param {string} fileExt The file extension parsed
  */
 async function renderPreview(file, fileExt) {
-  switch (extensions[fileExt]) {
-    case preview.markdown:
-      return await renderMarkdown(file['@microsoft.graph.downloadUrl'], '', 'style="margin-top: 0;"')
+    switch (extensions[fileExt]) {
+        case preview.markdown:
+            return await renderMarkdown(file['@microsoft.graph.downloadUrl'], '', 'style="margin-top: 0;"')
 
-    case preview.text:
-      return await renderCodePreview(file, '')
+        case preview.text:
+            return await renderCodePreview(file, '')
 
-    case preview.image:
-      return renderImage(file)
+        case preview.image:
+            return renderImage(file)
 
-    case preview.code:
-      return await renderCodePreview(file, fileExt)
+        case preview.code:
+            return await renderCodePreview(file, fileExt)
 
-    case preview.pdf:
-      return renderPDFPreview(file)
+        case preview.pdf:
+            return renderPDFPreview(file)
 
-    case preview.video:
-      return renderVideoPlayer(file)
+        case preview.video:
+            return renderVideoPlayer(file)
 
-    case preview.audio:
-      return renderAudioPlayer(file)
+        case preview.audio:
+            return renderAudioPlayer(file)
 
-    default:
-      return renderUnsupportedView(fileExt)
-  }
+        case preview.mkv:
+            return renderMKVPlayer(file)
+            
+        default:
+            return renderUnsupportedView(fileExt)
+    }
 }
 
 export async function renderFilePreview(file, path, fileExt) {
-  const el = (tag, attrs, content) => `<${tag} ${attrs.join(' ')}>${content}</${tag}>`
-  const div = (className, content) => el('div', [`class=${className}`], content)
+    const el = (tag, attrs, content) => `<${tag} ${attrs.join(' ')}>${content}</${tag}>`
+    const div = (className, content) => el('div', [`class=${className}`], content)
 
-  const body = div(
-    'container',
-    div('path', renderPath(path) + ` / ${file.name}`) +
-      div('items', el('div', ['style="padding: 1rem 1rem;"'], await renderPreview(file, fileExt))) +
-      div(
-        'download-button-container',
-        el(
-          'a',
-          ['class="download-button"', `href="${file['@microsoft.graph.downloadUrl']}"`],
-          '<i class="far fa-arrow-alt-circle-down"></i> DOWNLOAD'
+    const body = div(
+        'container',
+        div('path', renderPath(path) + ` / ${file.name}`) +
+        div('items', el('div', ['style="padding: 1rem 1rem;"'], await renderPreview(file, fileExt))) +
+        div(
+            'download-button-container',
+            el(
+                'a', ['class="download-button"', `href="${file['@microsoft.graph.downloadUrl']}"`],
+                '<i class="far fa-arrow-alt-circle-down"></i> DOWNLOAD'
+            )
         )
-      )
-  )
-  return renderHTML(body)
+    )
+    return renderHTML(body)
 }
