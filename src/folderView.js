@@ -36,7 +36,7 @@ function readableFileSize(bytes, si) {
  */
 export async function renderFolderView(items, path, request) {
   const isIndex = path === '/'
-
+  //const str='null'
   const el = (tag, attrs, content) => `<${tag} ${attrs.join(' ')}>${content}</${tag}>`
   const div = (className, content) => el('div', [`class=${className}`], content)
   const item = (icon, fileName, fileAbsoluteUrl, size, emojiIcon) =>
@@ -54,7 +54,7 @@ export async function renderFolderView(items, path, request) {
                     <p>This is Spencer's OneDrive public directory listing. Feel free to download any files that you find useful. Reach me at: spencer.wushangbo [at] gmail [dot] com.</p>
                     <p><a href="https://spencerwoo.com">Portfolio</a> · <a href="https://blog.spencerwoo.com">Blog</a> · <a href="https://github.com/spencerwooo">GitHub</a></p>
                   </div>`
-
+                    
   // Check if current directory contains README.md, if true, then render spinner
   let readmeExists = false
   let readmeFetchUrl = ''
@@ -71,14 +71,14 @@ export async function renderFolderView(items, path, request) {
             items
               .map(i => {
                 // Check if the current item is a folder or a file
-                if ('folder' in i) {
+                if ('folder' in i && !isIndex) {
                   let emoji = emojiRegex().exec(i.name)
                   if (emoji && !emoji.index) {
                     return item('', i.name.replace(emoji, '').trim(), `${path}${i.name}/`, i.size, emoji[0])
                   } else {
                     return item('far fa-folder', i.name, `${path}${i.name}/`, i.size)
                   }
-                } else if ('file' in i) {
+                } else if ('file' in i && !isIndex) {
                   // Check if README.md exists
                   if (!readmeExists) {
                     readmeExists = i.name.toLowerCase() === 'readme.md'
