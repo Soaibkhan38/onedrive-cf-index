@@ -1,3 +1,22 @@
+<h2>💎 Soap's Mod</h2>
+As I encode anime and share them, I wanted to share OneDrive folder links to users. So I indexed my OneDrive to make the experience better (and to not receive DMCAs on my actual drive).
+
+<h4>Issues:</h4>
+
+<h4>#Users could easily access folders of other encodes or the complete indexed OneDrive.</h4>
+<h4>#I choose .mkv as container for my videos, which wasn't supported.</h4>
+<h4>#It supports H264 in-browser streaming but not for H265.</h4>
+
+🎁My mods:
+1. If the user visits the Public directory, they won't be able to access all the indexed files.
+(here, [Team Drive site](https://teamdrive1.soap.workers.dev), you can't see the files/folders indexed, but [Test folder](https://teamdrive1.soap.workers.dev/test), here you can)
+2. Force-added support for .mkv files to detect as streamable file format.
+
+🐱‍👤Failures:
+1. Can't add support for H265 in-browser streaming as majority of the browsers don't support it (except, Safari).
+2. Couldn't find an HTML5 player with multiple audio and/or subs support, so, stuck with default.
+3. Idk anything about JS and was therefore unable to contribute much.
+
 [![Hosted on Cloudflare Workers](https://img.shields.io/badge/Hosted%20on-CF%20Workers-f38020?logo=cloudflare&logoColor=f38020&labelColor=282d33)](https://storage.spencerwoo.com/)
 [![Deploy](https://github.com/spencerwooo/onedrive-cf-index/workflows/Deploy/badge.svg)](https://github.com/spencerwooo/onedrive-cf-index/actions?query=workflow%3ADeploy)
 <image align="right" src="assets/onedrive-cf-index.png" alt="onedrive-cf-index" width="125px" />
