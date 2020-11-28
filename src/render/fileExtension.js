@@ -5,7 +5,8 @@ const preview = {
   pdf: 'pdf',
   code: 'code',
   video: 'video',
-  audio: 'audio'
+  audio: 'audio',
+  mkv: 'mkv'
 }
 
 const extensions = {
@@ -42,6 +43,8 @@ const extensions = {
   webm: preview.video,
   m3u8: preview.video,
 
+  mkv: preview.mkv,
+  
   mp3: preview.audio,
   m4a: preview.audio,
   aac: preview.audio,
